@@ -1,4 +1,4 @@
-# template-vanilla
+# js-basic-requests-zero-notes-app
 
 
 # 📋 Task for Students: API Integration with Form and Validation
