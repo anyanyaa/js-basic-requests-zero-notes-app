@@ -43,8 +43,13 @@ function validation(textarea, errorMessage) {
   }
 }
 
-function deleteNote(callback, id){
-  sendRequest(`${route}/api/v1/notes/${id}`, callback, "DELETE")
+function deleteItem(item) {
+  const elToDel = document.querySelector(`[data-id="${item.id}"]`);
+  elToDel.remove();
+}
+
+function deleteNote(callback, id) {
+  sendRequest(`${route}/api/v1/notes/${id}`, callback, 'DELETE');
 }
 
 function renderItem(item) {
@@ -63,10 +68,7 @@ function renderItem(item) {
   deleteButton.onclick = function () {
     const { id } = deleteButton.closest('.card').dataset;
 
-    deleteNote(function(){
-      getNotes(renderList)
-    }, id)
-
+    deleteNote(deleteItem, id);
   };
 
   cardContainer.append(noteEl);
