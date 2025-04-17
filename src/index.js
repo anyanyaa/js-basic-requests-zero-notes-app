@@ -1,56 +1,18 @@
+import {createNote, deleteNote, getNotes} from "./requests.js";
+import {validateInput} from "./validations.js";
+
+
 const form = document.querySelector('form');
 const textarea = document.querySelector('textarea');
 const errorMessage = document.querySelector('#textValidationMessage');
-const cardContainer = document.querySelector('.col-8.offset-2');
+const notesContainer = document.querySelector('.col-8.offset-2');
 
-const route = 'http://localhost:4400';
 
-/**
- *
- * @param {string} url
- * @param {Function} callback
- * @param {string|undefined} method
- * @param {any} body
- */
-
-function sendRequest(url, callback, method = 'GET', body = null) {
-  const request = new XMLHttpRequest();
-  request.open(method, url);
-  request.send(body);
-  request.onload = function () {
-    const response = JSON.parse(request.response);
-
-    callback(response);
-  };
-}
-
-function validation(textarea, errorMessage) {
-  const minLength = 6;
-  const maxLength = 300;
-
-  if (textarea.value.length < minLength) {
-    textarea.classList.add('is-invalid');
-    errorMessage.innerText = `Note text must be more than ${minLength} letters`;
-
-    return false;
-  } else if (textarea.value.length > maxLength) {
-    errorMessage.innerText = `Note text must be less than ${maxLength} letters`;
-
-    return false;
-  } else {
-    textarea.classList.remove('is-invalid');
-    return true;
-  }
-}
-
-function deleteItem(item) {
-  const elToDel = document.querySelector(`[data-id="${item.id}"]`);
+function deleteItemById(id) {
+  const elToDel = document.querySelector(`[data-id="${id}"]`);
   elToDel.remove();
 }
 
-function deleteNote(callback, id) {
-  sendRequest(`${route}/api/v1/notes/${id}`, callback, 'DELETE');
-}
 
 function renderItem(item) {
   const noteEl = document.createElement('div');
@@ -66,36 +28,28 @@ function renderItem(item) {
 
   const deleteButton = noteEl.querySelector('.btn-danger');
   deleteButton.onclick = function () {
-    const { id } = deleteButton.closest('.card').dataset;
+    const {id}  = deleteButton.closest('.card').dataset;
 
-    deleteNote(deleteItem, id);
+    deleteNote((note) => deleteItemById(note.id), id);
   };
 
-  cardContainer.append(noteEl);
+  notesContainer.append(noteEl);
 }
 
 function renderList(list) {
-  cardContainer.innerHTML = '';
+  notesContainer.innerHTML = '';
 
   list.forEach(function (note) {
     renderItem(note);
   });
 }
 
-function getNotes(callback) {
-  sendRequest(`${route}/api/v1/notes`, callback);
-}
-
 getNotes(renderList);
-
-function createNote(callback, body) {
-  sendRequest(`${route}/api/v1/notes`, callback, 'POST', body);
-}
 
 form.onsubmit = function (event) {
   event.preventDefault();
 
-  if (validation(textarea, errorMessage)) {
+  if (validateInput(textarea, errorMessage)) {
     const formData = new FormData(form);
 
     createNote(renderItem, formData);
