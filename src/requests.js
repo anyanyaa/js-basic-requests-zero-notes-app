@@ -29,12 +29,11 @@ export function sendRequest(url, method = 'GET', body = null) {
       const response = JSON.parse(request.response);
 
       resolve(response)
-
-      request.onerror = function (){
-        reject(new Error('network error'))
-      }
-
     };
+
+    request.onerror = function (){
+      reject(new Error('network error'))
+    }
 
   })
 }
