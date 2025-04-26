@@ -1,18 +1,15 @@
-import {createNote, deleteNote, getNotes} from "./requests.js";
-import {validateInput} from "./validations.js";
-
+import { createNote, deleteNote, getNotes } from './requests.js';
+import { validateInput } from './validations.js';
 
 const form = document.querySelector('form');
 const textarea = document.querySelector('textarea');
 const errorMessage = document.querySelector('#textValidationMessage');
 const notesContainer = document.querySelector('.col-8.offset-2');
 
-
 function deleteItemById(id) {
   const elToDel = document.querySelector(`[data-id="${id}"]`);
   elToDel.remove();
 }
-
 
 function renderItem(item) {
   const noteEl = document.createElement('div');
@@ -28,9 +25,11 @@ function renderItem(item) {
 
   const deleteButton = noteEl.querySelector('.btn-danger');
   deleteButton.onclick = function () {
-    const {id}  = deleteButton.closest('.card').dataset;
+    const { id } = deleteButton.closest('.card').dataset;
 
-    deleteNote((note) => deleteItemById(note.id), id);
+    deleteNote(id).then(function (response) {
+      deleteItemById(response.id);
+    });
   };
 
   notesContainer.append(noteEl);
@@ -44,7 +43,9 @@ function renderList(list) {
   });
 }
 
-getNotes(renderList);
+getNotes().then(function (response) {
+  renderList(response);
+});
 
 form.onsubmit = function (event) {
   event.preventDefault();
@@ -52,8 +53,10 @@ form.onsubmit = function (event) {
   if (validateInput(textarea, errorMessage)) {
     const formData = new FormData(form);
 
-    createNote(renderItem, formData);
+    createNote(formData).then(function (response) {
+      renderItem(response);
 
-    textarea.value = '';
+      textarea.value = '';
+    });
   }
 };
