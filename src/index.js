@@ -24,12 +24,11 @@ function renderItem(item) {
       `;
 
   const deleteButton = noteEl.querySelector('.btn-danger');
-  deleteButton.onclick = function () {
+  deleteButton.onclick = async function () {
     const { id } = deleteButton.closest('.card').dataset;
 
-    deleteNote(id).then(function (response) {
-      deleteItemById(response.id);
-    });
+    const response = await deleteNote(id);
+    deleteItemById(response.id);
   };
 
   notesContainer.append(noteEl);
@@ -47,16 +46,14 @@ getNotes().then(function (response) {
   renderList(response);
 });
 
-form.onsubmit = function (event) {
+form.onsubmit = async function (event) {
   event.preventDefault();
 
   if (validateInput(textarea, errorMessage)) {
     const formData = new FormData(form);
 
-    createNote(formData).then(function (response) {
-      renderItem(response);
-
-      textarea.value = '';
-    });
+    const response = await createNote(formData);
+    renderItem(response);
+    textarea.value = '';
   }
 };
